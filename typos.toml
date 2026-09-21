@@ -1,0 +1,10 @@
+[default]
+#extend-words."" = ""
+
+extend-ignore-re = [
+	# spell:ignore
+	"(?Rm)^.*(%|#|//|;)\\s*spell:ignore$",
+
+	# spell:<on|off>
+	"(?s)(%|#|//|;)\\s*spell:off.*?\\n\\s*(%|#|//)\\s*spell:on",
+]

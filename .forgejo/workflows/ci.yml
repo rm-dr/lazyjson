@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  typos:
+    name: "typos"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check typos
+        uses: crate-ci/typos@master
+        with:
+          config: ./typos.toml
+
+  #
+  # MARK: rust checks
+  #
+
+  clippy:
+    name: "clippy"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features
+
+  buildandtest-dev:
+    name: "test-dev"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
+      - name: Clap smoke check
+        run: cargo run -- docs
+
+  buildandtest:
+    name: "test"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Test
+        run: cargo test --release
+
+      - name: Clap smoke check
+        run: cargo run --release -- docs
+
+  buildandtest-allfeatures-dev:
+    name: "test-all-features-dev"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (all features)
+        run: cargo build-all-features
+
+      - name: Test (all features)
+        run: cargo test-all-features
+
+  buildandtest-allfeatures:
+    name: "test-all-features"
+    runs-on: rust-1.97.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (all features)
+        run: cargo build-all-features -- --release
+
+      - name: Test (all features)
+        run: cargo test-all-features -- --release

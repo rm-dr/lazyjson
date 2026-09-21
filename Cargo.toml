@@ -1,0 +1,66 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+rust-version = "1.97.0"
+edition = "2024"
+version = "0.0.1"
+
+[workspace.lints.rust]
+unused_import_braces = "deny"
+unit_bindings = "deny"
+single_use_lifetimes = "deny"
+non_ascii_idents = "deny"
+macro_use_extern_crate = "deny"
+elided_lifetimes_in_paths = "deny"
+absolute_paths_not_starting_with_crate = "deny"
+explicit_outlives_requirements = "warn"
+unused_crate_dependencies = "warn"
+redundant_lifetimes = "warn"
+missing_docs = "allow"
+
+[workspace.lints.clippy]
+todo = "deny"
+uninlined_format_args = "allow"
+result_large_err = "allow"
+too_many_arguments = "allow"
+upper_case_acronyms = "deny"
+needless_return = "allow"
+new_without_default = "allow"
+tabs_in_doc_comments = "allow"
+dbg_macro = "deny"
+allow_attributes = "deny"
+create_dir = "deny"
+filetype_is_file = "deny"
+integer_division = "allow"
+lossy_float_literal = "deny"
+map_err_ignore = "allow"
+mutex_atomic = "deny"
+needless_raw_strings = "deny"
+str_to_string = "deny"
+string_add = "deny"
+implicit_clone = "deny"
+use_debug = "allow"
+verbose_file_reads = "allow"
+large_types_passed_by_value = "deny"
+wildcard_dependencies = "deny"
+negative_feature_names = "deny"
+redundant_feature_names = "deny"
+multiple_crate_versions = "allow"
+missing_safety_doc = "warn"
+identity_op = "allow"
+print_stderr = "deny"
+print_stdout = "deny"
+comparison_chain = "allow"
+unimplemented = "deny"
+unwrap_used = "warn"
+expect_used = "warn"
+type_complexity = "allow"
+len_without_is_empty = "allow"
+
+#
+# MARK: dependencies
+#
+
+[workspace.dependencies]
