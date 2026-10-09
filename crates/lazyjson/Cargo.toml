@@ -1,8 +1,12 @@
 [package]
 name = "lazyjson"
+description = "Lazily-computed value extraction"
 version = { workspace = true }
 rust-version = { workspace = true }
 edition = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+license = { workspace = true }
 
 [lints]
 workspace = true
