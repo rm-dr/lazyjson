@@ -50,29 +50,6 @@ async fn substitute(
 	}
 }
 
-/// Expand a single bare expression — `src` is what would sit inside a `{{ … }}`,
-/// with no surrounding literal text — against `scope`.
-///
-/// This is the entry point for the places that store one expression rather than
-/// a whole template (a prompt version's media attachments, say). It renders
-/// exactly as the matching substitution in a template would.
-pub async fn expand_expr(
-	src: &str,
-	scope: HashMap<Label, ELazyValue>,
-	state: &ExtractState,
-	root: &ELazyValue,
-) -> Result<Expansion, ExpandError> {
-	let scoped_state = ExtractState {
-		aliases: scope_to_aliases(&scope),
-		..state.clone()
-	};
-
-	Ok(Expansion {
-		text: substitute(src, state, &scoped_state, root).await?,
-		scope,
-	})
-}
-
 /// Expand `nodes` against `scope`, returning the rendered text plus the scope
 /// it ends with — the bindings its `{{ let }}` nodes made, on top of the scope
 /// it was given. See [`Expansion`].
@@ -287,6 +264,23 @@ mod tests {
 		template::Template,
 		value::{LazyValue, extract::core::MapExtractor},
 	};
+
+	async fn expand_expr(
+		src: &str,
+		scope: HashMap<Label, ELazyValue>,
+		state: &ExtractState,
+		root: &ELazyValue,
+	) -> Result<Expansion, ExpandError> {
+		let scoped_state = ExtractState {
+			aliases: scope_to_aliases(&scope),
+			..state.clone()
+		};
+
+		Ok(Expansion {
+			text: substitute(src, state, &scoped_state, root).await?,
+			scope,
+		})
+	}
 
 	fn str_val(v: &str) -> ELazyValue {
 		LazyValue::String(Arc::new(v.into())).into()
