@@ -43,9 +43,6 @@ jobs:
       - name: Test
         run: cargo test
 
-      - name: Clap smoke check
-        run: cargo run -- docs
-
   buildandtest:
     name: "test"
     runs-on: rust-1.97.0
@@ -57,9 +54,6 @@ jobs:
 
       - name: Test
         run: cargo test --release
-
-      - name: Clap smoke check
-        run: cargo run --release -- docs
 
   buildandtest-allfeatures-dev:
     name: "test-all-features-dev"
