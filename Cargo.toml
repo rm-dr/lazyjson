@@ -6,7 +6,7 @@ resolver = "2"
 rust-version = "1.97.0"
 edition = "2024"
 version = "0.0.2"
-repository = "https://git.betalupi.com/Mark/lazyjson"
+repository = "https://github.com/rm-dr/lazyjson"
 readme = "README.md"
 license = "Apache-2.0"
 
