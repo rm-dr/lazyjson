@@ -8,7 +8,7 @@ use crate::{
 	Label,
 	value::{
 		ELazyValue, LazyValue,
-		extract::{ExtractError, traits::ObjectExtractor},
+		extract::{EvalError, traits::ObjectExtractor},
 	},
 };
 
@@ -29,7 +29,7 @@ impl ObjectExtractor for StringExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		Ok(match (name.as_str(), args) {
 			("trim", None) => {
 				Some(LazyValue::String(Arc::new(self.item.as_str().trim().into())).into())
@@ -101,7 +101,7 @@ impl ObjectExtractor for StringExtractor {
 	}
 
 	#[expect(clippy::unwrap_used)]
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		return Ok(vec![
 			Label::new("trim").unwrap(),
 			Label::new("upper").unwrap(),

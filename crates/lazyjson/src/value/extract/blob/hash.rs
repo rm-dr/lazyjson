@@ -3,7 +3,7 @@ use tokio::sync::OnceCell;
 
 use crate::Label;
 use crate::SyncReadBridge;
-use crate::value::extract::ExtractError;
+use crate::value::extract::EvalError;
 use crate::value::extract::ExtractState;
 use crate::value::extract::traits::ObjectExtractor;
 use crate::value::{BinaryLazyValue, ELazyValue, LazyValue};
@@ -96,7 +96,7 @@ impl ObjectExtractor for HashExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -108,7 +108,7 @@ impl ObjectExtractor for HashExtractor {
 		state.resolve_field(name, value)
 	}
 
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		Ok(LABELS.clone())
 	}
 }

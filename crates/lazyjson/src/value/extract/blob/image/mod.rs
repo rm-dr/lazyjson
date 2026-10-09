@@ -8,7 +8,7 @@ mod transform;
 
 use crate::Label;
 use crate::asyncreader::AsyncReader;
-use crate::value::extract::ExtractError;
+use crate::value::extract::EvalError;
 use crate::value::extract::ExtractState;
 use crate::value::extract::traits::ObjectExtractor;
 use crate::value::{ArcBytes, BinaryLazyValue, ELazyValue, LazyValue};
@@ -25,7 +25,7 @@ impl ImageExtractor {
 	async fn apply<T: ImageTransformer + Send + 'static>(
 		&self,
 		args: &str,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		let transformer = match T::parse_args(args) {
 			Ok(t) => t,
 			Err(_) => return Ok(None),
@@ -85,7 +85,7 @@ impl ObjectExtractor for ImageExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		let Some(args) = args else {
 			return Ok(None);
 		};
@@ -100,7 +100,7 @@ impl ObjectExtractor for ImageExtractor {
 	}
 
 	#[expect(clippy::unwrap_used)]
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		Ok(vec![
 			Label::new("maxdim").unwrap(),
 			Label::new("crop").unwrap(),

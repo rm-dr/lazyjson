@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::value::{
 	ELazyValue,
 	extract::ExtractState,
-	extract::{ExtractError, traits::ListExtractor},
+	extract::{EvalError, traits::ListExtractor},
 };
 
 #[derive(Default)]
@@ -23,11 +23,11 @@ impl ListExtractor for VecExtractor {
 		&self,
 		_state: &ExtractState,
 		idx: usize,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		Ok(self.inner.get(idx).cloned())
 	}
 
-	async fn len(&self, _state: &ExtractState) -> Result<usize, ExtractError> {
+	async fn len(&self, _state: &ExtractState) -> Result<usize, EvalError> {
 		Ok(self.inner.len())
 	}
 }

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::Label;
 use crate::value::ELazyValue;
-use crate::value::extract::ExtractError;
+use crate::value::extract::EvalError;
 use crate::value::extract::ExtractState;
 use crate::value::extract::traits::ObjectExtractor;
 
@@ -19,7 +19,7 @@ impl ObjectExtractor for MapExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -27,7 +27,7 @@ impl ObjectExtractor for MapExtractor {
 		state.resolve_field(name, self.inner.read().get(name).cloned())
 	}
 
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		Ok(self.inner.read().keys().cloned().collect())
 	}
 }

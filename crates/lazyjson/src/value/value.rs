@@ -17,7 +17,7 @@ use crate::{
 	value::{
 		ItemReader,
 		extract::{
-			ExtractError, ExtractState, JsonMode,
+			EvalError, ExtractState, JsonMode,
 			blob::BinaryExtractor,
 			core::{ListObjectExtractor, MapExtractor, VecExtractor},
 			extra::{StringExtractor, UuidExtractor},
@@ -136,6 +136,8 @@ impl PartialEq for LazyValue {
 			(LazyValue::I64(l), LazyValue::U64(r)) => {
 				(*l).try_into().map(|l: u64| l == *r).unwrap_or(false)
 			}
+
+			(LazyValue::F64(l), LazyValue::F64(r)) => l == r || (l.is_nan() && r.is_nan()),
 
 			(LazyValue::String(l), LazyValue::String(r)) => l == r,
 
@@ -302,6 +304,7 @@ impl LazyValue {
 		match self {
 			LazyValue::U64(x) => Some(*x as f64),
 			LazyValue::I64(x) => Some(*x as f64),
+			LazyValue::F64(x) => Some(*x),
 			LazyValue::Timestamp(x) => Some(*x as f64),
 			LazyValue::String(s) => s.parse::<f64>().ok(),
 			LazyValue::Root(x) => x.inner.num(),
@@ -408,7 +411,7 @@ impl ELazyValue {
 	/// - `ObjectExtractor` is recursed into; returns `Some(Object(map))` with
 	///   only the fields that had data, or `None` if all fields were absent.
 	/// - `Array` / `ListExtractor` are treated as opaque leaf values (not descended into).
-	pub async fn count_fields(&self, state: &ExtractState) -> Result<Option<Value>, ExtractError> {
+	pub async fn count_fields(&self, state: &ExtractState) -> Result<Option<Value>, EvalError> {
 		Ok(match &self.inner {
 			LazyValue::Null => None,
 
@@ -459,7 +462,7 @@ impl ELazyValue {
 		}
 	}
 
-	pub async fn to_json(&self, state: &ExtractState) -> Result<Option<Value>, ExtractError> {
+	pub async fn to_json(&self, state: &ExtractState) -> Result<Option<Value>, EvalError> {
 		Ok(match &self.inner {
 			LazyValue::Null => Some(Value::Null),
 			LazyValue::Bool(x) => Some(Value::Bool(*x)),
@@ -486,7 +489,7 @@ impl ELazyValue {
 					bytes.0.len()
 				))),
 				JsonMode::Strict => {
-					return Err(ExtractError::NotJsonable(format!(
+					return Err(EvalError::NotJsonable(format!(
 						"blob ({mime}, {} bytes)",
 						bytes.0.len()
 					)));

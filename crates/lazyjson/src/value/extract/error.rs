@@ -1,6 +1,6 @@
 /// An error produced while extracting fields from an item.
 #[derive(Debug, thiserror::Error)]
-pub enum ExtractError {
+pub enum EvalError {
 	#[error(transparent)]
 	IoError(#[from] std::io::Error),
 
@@ -24,7 +24,7 @@ pub enum ExtractError {
 	NotJsonable(String),
 }
 
-impl ExtractError {
+impl EvalError {
 	pub fn other(
 		message: impl Into<String>,
 		source: impl std::error::Error + Send + Sync + 'static,
@@ -36,16 +36,16 @@ impl ExtractError {
 	}
 }
 
-impl From<tokio::task::JoinError> for ExtractError {
+impl From<tokio::task::JoinError> for EvalError {
 	fn from(err: tokio::task::JoinError) -> Self {
 		Self::other("background task failed", err)
 	}
 }
 
-impl From<ExtractError> for std::io::Error {
-	fn from(err: ExtractError) -> Self {
+impl From<EvalError> for std::io::Error {
+	fn from(err: EvalError) -> Self {
 		match err {
-			ExtractError::IoError(io) => io,
+			EvalError::IoError(io) => io,
 			other => std::io::Error::other(other),
 		}
 	}

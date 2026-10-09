@@ -9,7 +9,7 @@ use crate::{
 	value::{
 		ArcBytes, BinaryLazyValue, ELazyValue, LazyValue,
 		extract::{
-			ExtractError, ExtractState,
+			EvalError, ExtractState,
 			traits::{ListExtractor, ObjectExtractor},
 		},
 	},
@@ -53,11 +53,7 @@ impl Id3ImagesExtractor {
 
 #[async_trait::async_trait]
 impl ListExtractor for Id3ImagesExtractor {
-	async fn get(
-		&self,
-		state: &ExtractState,
-		idx: usize,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	async fn get(&self, state: &ExtractState, idx: usize) -> Result<Option<ELazyValue>, EvalError> {
 		if !(self.mime_ok(state) || state.ignore_mime) {
 			return Ok(None);
 		}
@@ -85,7 +81,7 @@ impl ListExtractor for Id3ImagesExtractor {
 		))
 	}
 
-	async fn len(&self, state: &ExtractState) -> Result<usize, ExtractError> {
+	async fn len(&self, state: &ExtractState) -> Result<usize, EvalError> {
 		if !(self.mime_ok(state) || state.ignore_mime) {
 			return Ok(0);
 		}
@@ -218,7 +214,7 @@ impl ObjectExtractor for Id3Extractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -237,7 +233,7 @@ impl ObjectExtractor for Id3Extractor {
 		state.resolve_field(name, value)
 	}
 
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut out = self.output.lock().await;
 		if out.is_none() {
 			*out = Some(self.compute(state).await?);

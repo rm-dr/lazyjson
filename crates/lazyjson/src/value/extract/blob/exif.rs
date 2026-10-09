@@ -6,7 +6,7 @@ use crate::{
 	Label, SyncReadBridge,
 	value::{
 		BinaryLazyValue, ELazyValue, LazyValue,
-		extract::{ExtractError, ExtractState, traits::ObjectExtractor},
+		extract::{EvalError, ExtractState, traits::ObjectExtractor},
 	},
 };
 
@@ -92,7 +92,7 @@ impl ObjectExtractor for ExifExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		trace!(
 			?args,
 			item = ?self.item,
@@ -113,7 +113,7 @@ impl ObjectExtractor for ExifExtractor {
 		state.resolve_field(name, value)
 	}
 
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut out = self.output.lock().await;
 		if out.is_none() {
 			*out = Some(self.compute(state).await?);

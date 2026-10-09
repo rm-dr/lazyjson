@@ -8,7 +8,7 @@ use crate::{
 	value::{
 		ELazyValue, LazyValue,
 		extract::{
-			ExtractError,
+			EvalError,
 			traits::{ListExtractor, ObjectExtractor},
 		},
 	},
@@ -48,7 +48,7 @@ impl ObjectExtractor for RegexExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -70,7 +70,7 @@ impl ObjectExtractor for RegexExtractor {
 		))
 	}
 
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		#[expect(clippy::unwrap_used)]
 		Ok(self
 			.0
@@ -92,7 +92,7 @@ impl ListExtractor for RegexExtractor {
 		&self,
 		_state: &ExtractState,
 		idx: usize,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		let raw_idx = idx + 1;
 		let Some(slot) = self.0.captures.get(raw_idx) else {
 			return Ok(None);
@@ -103,7 +103,7 @@ impl ListExtractor for RegexExtractor {
 		}))
 	}
 
-	async fn len(&self, _state: &ExtractState) -> Result<usize, ExtractError> {
+	async fn len(&self, _state: &ExtractState) -> Result<usize, EvalError> {
 		Ok(self.0.captures.len().saturating_sub(1))
 	}
 }

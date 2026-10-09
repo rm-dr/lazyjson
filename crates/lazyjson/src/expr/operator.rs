@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use crate::{
 	expr::glob::GlobPattern,
-	value::{ELazyValue, LazyValue, extract::ExtractError},
+	value::{ELazyValue, LazyValue, extract::EvalError},
 };
 
 /// A binary operator that computes a value
@@ -134,7 +134,7 @@ impl BinOp {
 		strict: bool,
 		left: &ELazyValue,
 		right: &ELazyValue,
-	) -> Result<ELazyValue, ExtractError> {
+	) -> Result<ELazyValue, EvalError> {
 		Ok(match self {
 			Self::Eq => LazyValue::Bool(left.inner == right.inner).into(),
 			Self::Neq => LazyValue::Bool(left.inner != right.inner).into(),
@@ -182,7 +182,7 @@ impl BinOp {
 				{
 					Ok(r) => LazyValue::Bool(r.is_match(value)).into(),
 					Err(e) if strict => {
-						return Err(ExtractError::InvalidArgs(format!(
+						return Err(EvalError::InvalidArgs(format!(
 							"invalid regex {pattern:?}: {e}"
 						)));
 					}
@@ -201,7 +201,7 @@ impl BinOp {
 					match rule.regex() {
 						Ok(r) => LazyValue::Bool(r.is_match(value)).into(),
 						Err(e) if strict => {
-							return Err(ExtractError::InvalidArgs(format!(
+							return Err(EvalError::InvalidArgs(format!(
 								"invalid glob {pattern:?}: {e}"
 							)));
 						}
@@ -319,7 +319,7 @@ mod tests {
 	#[test]
 	fn match_bad_pattern_strict_errors() {
 		let err = BinOp::Match.eval(true, &s("hello"), &s("(")).unwrap_err();
-		assert!(matches!(err, ExtractError::InvalidArgs(_)), "got {err:?}");
+		assert!(matches!(err, EvalError::InvalidArgs(_)), "got {err:?}");
 	}
 
 	#[test]
@@ -355,6 +355,6 @@ mod tests {
 		let err = BinOp::GlobMatch
 			.eval(true, &s("a"), &s("***a"))
 			.unwrap_err();
-		assert!(matches!(err, ExtractError::InvalidArgs(_)), "got {err:?}");
+		assert!(matches!(err, EvalError::InvalidArgs(_)), "got {err:?}");
 	}
 }

@@ -36,7 +36,7 @@ use crate::{
 	Label,
 	value::{
 		BinaryLazyValue, ELazyValue, LazyValue,
-		extract::{ExtractError, core::MapExtractor, traits::ObjectExtractor},
+		extract::{EvalError, core::MapExtractor, traits::ObjectExtractor},
 	},
 };
 
@@ -100,7 +100,7 @@ impl ObjectExtractor for BinaryExtractor {
 		state: &ExtractState,
 		name: &crate::Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		#[cfg(feature = "image")]
 		if self.image.fields(state).await?.contains(name) {
 			return self.image.field(state, name, args).await;
@@ -111,7 +111,7 @@ impl ObjectExtractor for BinaryExtractor {
 
 	#[expect(clippy::allow_attributes)]
 	#[allow(unused_mut)]
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut fields = self.inner.fields(state).await?;
 
 		#[cfg(feature = "image")]

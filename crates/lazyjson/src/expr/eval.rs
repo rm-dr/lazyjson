@@ -5,7 +5,7 @@ use crate::{
 	expr::tree::LazyExpressionTree,
 	value::{
 		ELazyValue, LazyValue,
-		extract::{ExtractError, ExtractState},
+		extract::{EvalError, ExtractState},
 	},
 };
 
@@ -32,7 +32,7 @@ impl ExpressionEvaluator<'_> {
 	pub fn eval<'a>(
 		&'a self,
 		expr: &'a LazyExpressionTree,
-	) -> Pin<Box<impl Future<Output = Result<ELazyValue, ExtractError>> + 'a>> {
+	) -> Pin<Box<impl Future<Output = Result<ELazyValue, EvalError>> + 'a>> {
 		Box::pin(async move {
 			Ok(self
 				.eval_node(expr, true)
@@ -46,7 +46,7 @@ impl ExpressionEvaluator<'_> {
 		&'a self,
 		expr: &'a LazyExpressionTree,
 		root: bool,
-	) -> Pin<Box<dyn Future<Output = Result<Option<ELazyValue>, ExtractError>> + 'a>> {
+	) -> Pin<Box<dyn Future<Output = Result<Option<ELazyValue>, EvalError>> + Send + 'a>> {
 		Box::pin(async move {
 			if root
 				&& is_path(expr)
@@ -61,7 +61,7 @@ impl ExpressionEvaluator<'_> {
 
 				LazyExpressionTree::Alias(name) => {
 					let bound = self.state.aliases.get(name).ok_or_else(|| {
-						ExtractError::BadField(format!("unknown alias {:?}", name.as_str()))
+						EvalError::BadField(format!("unknown alias {:?}", name.as_str()))
 					})?;
 
 					self.eval_node(bound, false).await?
@@ -92,7 +92,7 @@ impl ExpressionEvaluator<'_> {
 					// `[@.i]` are both indices — and must be a number.
 					let idx = self.eval(idx).await?;
 					let Some(idx) = idx.inner.num() else {
-						return Err(ExtractError::BadField(format!(
+						return Err(EvalError::BadField(format!(
 							"index must be a number, got {:?}",
 							idx.inner
 						)));

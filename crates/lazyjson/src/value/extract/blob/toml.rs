@@ -3,7 +3,7 @@ use tokio::sync::Mutex;
 
 use crate::AsyncReader;
 use crate::Label;
-use crate::value::extract::ExtractError;
+use crate::value::extract::EvalError;
 use crate::value::extract::ExtractState;
 use crate::value::extract::traits::ObjectExtractor;
 use crate::value::{BinaryLazyValue, ELazyValue, LazyValue};
@@ -70,7 +70,7 @@ impl ObjectExtractor for TomlExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -85,7 +85,7 @@ impl ObjectExtractor for TomlExtractor {
 		state.resolve_field(name, value)
 	}
 
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut out = self.output.lock().await;
 		if out.is_none() {
 			*out = Some(self.compute(state).await?);

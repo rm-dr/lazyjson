@@ -11,7 +11,7 @@ use crate::{
 	Label,
 	value::{
 		BinaryLazyValue, ELazyValue, LazyValue,
-		extract::{ExtractError, traits::ObjectExtractor},
+		extract::{EvalError, traits::ObjectExtractor},
 	},
 };
 
@@ -163,7 +163,7 @@ impl ObjectExtractor for FsExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if args.is_some() {
 			return state.unexpected_args(name);
 		}
@@ -179,7 +179,7 @@ impl ObjectExtractor for FsExtractor {
 		state.resolve_field(name, value)
 	}
 
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut out = self.output.lock().await;
 		if out.is_none() {
 			let path = self.path.clone();

@@ -5,7 +5,7 @@ use crate::{
 	value::{
 		ELazyValue, LazyValue,
 		extract::{
-			ExtractError, ExtractState,
+			EvalError, ExtractState,
 			traits::{ListExtractor, ObjectExtractor},
 		},
 	},
@@ -29,7 +29,7 @@ impl ObjectExtractor for ListObjectExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		if name.as_str() != "len" {
 			return state.unknown_field(name);
 		}
@@ -42,7 +42,7 @@ impl ObjectExtractor for ListObjectExtractor {
 		Ok(Some(LazyValue::U64(len as u64).into()))
 	}
 
-	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, _state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		Ok(Label::new("len").into_iter().collect())
 	}
 }

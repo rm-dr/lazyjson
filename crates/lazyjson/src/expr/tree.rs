@@ -609,6 +609,11 @@ mod tests {
 		LazyExpressionTree::Literal(LazyValue::I64(x).into())
 	}
 
+	/// Expected `Tree::Literal` float leaf.
+	fn float(x: f64) -> LazyExpressionTree {
+		LazyExpressionTree::Literal(LazyValue::F64(x).into())
+	}
+
 	/// Expected `Tree::Binop` node.
 	fn binop(left: LazyExpressionTree, op: BinOp, right: LazyExpressionTree) -> LazyExpressionTree {
 		LazyExpressionTree::Binop {
@@ -952,9 +957,8 @@ mod tests {
 	}
 
 	#[test]
-	fn single_literal_float_falls_back_to_string() {
-		// `LazyValue` has no float variant, so floats become strings.
-		assert_eq!(build(vec![n("1.5")]), lit("1.5"));
+	fn single_literal_float() {
+		assert_eq!(build(vec![n("1.5")]), float(1.5));
 	}
 
 	//
@@ -1161,16 +1165,14 @@ mod tests {
 	#[test]
 	fn comparison_binds_tighter_than_logand() {
 		// `@.w >= 0.7 && @.c >= 0.7` == `(@.w >= 0.7) && (@.c >= 0.7)`.
-		// The `0.7` float literals fall back to string leaves (no float variant),
-		// then coerce back to numbers at eval time.
 		assert_eq!(
 			"@.w >= 0.7 && @.c >= 0.7"
 				.parse::<LazyExpressionTree>()
 				.unwrap(),
 			binop(
-				binop(path("@.w"), BinOp::Gte, lit("0.7")),
+				binop(path("@.w"), BinOp::Gte, float(0.7)),
 				BinOp::LogAnd,
-				binop(path("@.c"), BinOp::Gte, lit("0.7")),
+				binop(path("@.c"), BinOp::Gte, float(0.7)),
 			),
 		);
 	}

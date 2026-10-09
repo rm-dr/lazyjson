@@ -1,6 +1,8 @@
 pub mod expr;
-//pub mod extract;
 pub mod value;
+
+#[cfg(feature = "template")]
+pub mod template;
 
 mod asyncreader;
 pub use asyncreader::*;

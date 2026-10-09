@@ -2,7 +2,7 @@ use smartstring::{LazyCompact, SmartString};
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::value::extract::{ExtractError, ExtractState};
+use crate::value::extract::{EvalError, ExtractState};
 use crate::{
 	Label,
 	value::{
@@ -42,7 +42,7 @@ impl ObjectExtractor for UuidExtractor {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		// A uuid method takes no arguments; `.hex(x)` is a mistake, not a string
 		// method, so it must not fall through to `StringExtractor`.
 		if args.is_some() && UUID_FIELDS.contains(&name.as_str()) {
@@ -96,7 +96,7 @@ impl ObjectExtractor for UuidExtractor {
 		.map(Into::into))
 	}
 
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError> {
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError> {
 		let mut fields: Vec<Label> = UUID_FIELDS
 			.iter()
 			.chain(std::iter::once(&"timestamp"))

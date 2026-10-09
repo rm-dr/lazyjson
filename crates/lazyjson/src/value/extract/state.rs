@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use crate::{
 	Label,
 	expr::tree::LazyExpressionTree,
-	value::{ELazyValue, extract::ExtractError},
+	value::{ELazyValue, extract::EvalError},
 };
 
 /// How `to_json` handles values that have no JSON representation
@@ -47,9 +47,9 @@ pub struct ExtractState {
 }
 
 impl ExtractState {
-	pub fn unknown_field(&self, name: &Label) -> Result<Option<ELazyValue>, ExtractError> {
+	pub fn unknown_field(&self, name: &Label) -> Result<Option<ELazyValue>, EvalError> {
 		if self.strict {
-			Err(ExtractError::BadField(format!(
+			Err(EvalError::BadField(format!(
 				"unknown field {:?}",
 				name.as_str()
 			)))
@@ -58,9 +58,9 @@ impl ExtractState {
 		}
 	}
 
-	pub fn unexpected_args(&self, name: &Label) -> Result<Option<ELazyValue>, ExtractError> {
+	pub fn unexpected_args(&self, name: &Label) -> Result<Option<ELazyValue>, EvalError> {
 		if self.strict {
-			Err(ExtractError::InvalidArgs(format!(
+			Err(EvalError::InvalidArgs(format!(
 				"field {:?} does not accept arguments",
 				name.as_str()
 			)))
@@ -73,7 +73,7 @@ impl ExtractState {
 		&self,
 		name: &Label,
 		value: Option<ELazyValue>,
-	) -> Result<Option<ELazyValue>, ExtractError> {
+	) -> Result<Option<ELazyValue>, EvalError> {
 		match value {
 			Some(v) => Ok(Some(v)),
 			None => self.unknown_field(name),

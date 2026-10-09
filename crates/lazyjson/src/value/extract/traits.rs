@@ -1,6 +1,6 @@
 use crate::Label;
 use crate::value::extract::ExtractState;
-use crate::value::{ELazyValue, extract::ExtractError};
+use crate::value::{ELazyValue, extract::EvalError};
 
 /// An attachment that extracts metadata from an [Item].
 ///
@@ -22,7 +22,7 @@ pub trait ObjectExtractor: Send + Sync + std::any::Any {
 		state: &ExtractState,
 		name: &Label,
 		args: Option<&str>,
-	) -> Result<Option<ELazyValue>, ExtractError>;
+	) -> Result<Option<ELazyValue>, EvalError>;
 
 	/// Return all fields in this extractor.
 	/// `Self::field` must return [Some] for all these keys
@@ -30,7 +30,7 @@ pub trait ObjectExtractor: Send + Sync + std::any::Any {
 	///
 	/// The output of this field is not constant, different items
 	/// can produce different fields when processed by the same extractor.
-	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, ExtractError>;
+	async fn fields(&self, state: &ExtractState) -> Result<Vec<Label>, EvalError>;
 
 	/// Return a list view of this extractor, if supported.
 	fn as_list(&self) -> Option<std::sync::Arc<dyn ListExtractor>> {
@@ -38,10 +38,7 @@ pub trait ObjectExtractor: Send + Sync + std::any::Any {
 	}
 
 	/// Convert this to a JSON value.
-	async fn to_json(
-		&self,
-		state: &ExtractState,
-	) -> Result<Option<serde_json::Value>, ExtractError> {
+	async fn to_json(&self, state: &ExtractState) -> Result<Option<serde_json::Value>, EvalError> {
 		let keys = self.fields(state).await?;
 		let mut map = serde_json::Map::new();
 		for k in &keys {
@@ -69,19 +66,12 @@ pub trait ListExtractor: Send + Sync {
 	/// Indices start at zero, and must be consecutive.
 	/// - returns `None` if `idx` is out of range
 	/// - returns `Some(Null)` if `None` is at `idx`
-	async fn get(
-		&self,
-		state: &ExtractState,
-		idx: usize,
-	) -> Result<Option<ELazyValue>, ExtractError>;
+	async fn get(&self, state: &ExtractState, idx: usize) -> Result<Option<ELazyValue>, EvalError>;
 
-	async fn len(&self, state: &ExtractState) -> Result<usize, ExtractError>;
+	async fn len(&self, state: &ExtractState) -> Result<usize, EvalError>;
 
 	/// Convert this list to a JSON value.
-	async fn to_json(
-		&self,
-		state: &ExtractState,
-	) -> Result<Option<serde_json::Value>, ExtractError> {
+	async fn to_json(&self, state: &ExtractState) -> Result<Option<serde_json::Value>, EvalError> {
 		let len = self.len(state).await?;
 		let mut list = Vec::with_capacity(len);
 		for i in 0..len {
