@@ -1,0 +1,43 @@
+[package]
+name = "lazyjson"
+version = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+
+[lints]
+workspace = true
+
+[dependencies]
+
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+mime = { workspace = true }
+parking_lot = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+smartstring = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+regex = { workspace = true }
+
+toml = { workspace = true, optional = true }
+md5 = { workspace = true, optional = true }
+image = { workspace = true, optional = true }
+blake3 = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
+sha1 = { workspace = true, optional = true }
+mime_guess = { workspace = true, optional = true }
+id3 = { workspace = true, optional = true }
+kamadak-exif = { workspace = true, optional = true }
+strum = { workspace = true, optional = true }
+
+[features]
+default = []
+fs = ["dep:mime_guess"]
+hash = ["dep:sha1", "dep:sha2", "dep:blake3", "dep:md5"]
+toml = ["dep:toml"]
+id3 = ["dep:id3"]
+exif = ["dep:kamadak-exif"]
+image = ["dep:image", "dep:strum"]
